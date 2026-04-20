@@ -1,95 +1,111 @@
 # Order Management API
 
-RESTful API quản lý đơn hàng (Orders) — Lab 2, Nhóm 2  
-Xây dựng bằng **Node.js + Express + MongoDB Atlas + Mongoose**
+RESTful API quản ly don hang (Orders) - Lab 2, Nhom 2  
+Stack: Node.js, Express, MongoDB Atlas, Mongoose
+## Muc Tieu
 
----
+- Xay dung backend CRUD cho don hang.
+- Ap dung validation nang cao: `totalAmount = sum(quantity * unitPrice)`.
+- Chuan hoa response JSON theo mot format thong nhat.
+- Ho tro loc, tim kiem, sap xep du lieu don hang.
+- Trien khai backend len Render de test online.
 
-## Giới thiệu
+## Link Demo Va Repo
 
-Project này xây dựng một backend API hoàn chỉnh cho hệ thống quản lý đơn hàng, bao gồm:
-- Tạo, đọc, cập nhật, xóa đơn hàng (CRUD)
-- Lọc theo trạng thái, tìm kiếm theo tên, sắp xếp theo tổng tiền
-- Validate dữ liệu nghiêm ngặt (bao gồm kiểm tra totalAmount)
-- Response JSON chuẩn hóa
-- Logging request bằng morgan
+- Demo Render: https://order-management-api-64wl.onrender.com
+- Health check: https://order-management-api-64wl.onrender.com/
+- Repository: https://github.com/danielnguyendbk/order-management-api
 
----
+## Kien Truc
 
-## Cài đặt
+```text
+Client (Postman / Frontend)
+        |
+        v
+Express Server (server.js)
+  - Middleware: cors, morgan, express.json
+  - Route prefix: /api/orders
+        |
+        v
+Order Routes (routes/orderRoutes.js)
+  - CRUD + filter/search/sort
+  - Validate totalAmount, ObjectId
+        |
+        v
+Mongoose Model (models/Order.js)
+        |
+        v
+MongoDB Atlas
+```
+
+## Huong Dan Setup Local
+
+### 1) Clone va cai dependencies
 
 ```bash
-# 1. Clone hoặc tải project về
-git clone <repo-url>
+git clone https://github.com/danielnguyendbk/order-management-api.git
 cd order-management-api
-
-# 2. Cài đặt dependencies
 npm install
 ```
 
----
-
-## Cấu hình môi trường
+### 2) Tao file env
 
 ```bash
-# Tạo file .env từ file mẫu
+# Linux/macOS
 cp .env.example .env
 
-# Windows (cmd)
+# Windows cmd
 copy .env.example .env
 ```
 
-Mở file `.env` và điền thông tin thực tế:
+Cap nhat `.env`:
 
-```
+```dotenv
 PORT=5000
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxx.mongodb.net/OrderDB?retryWrites=true&w=majority
+NODE_ENV=development
 MONGO_DNS_SERVERS=8.8.8.8,1.1.1.1
 ```
 
-> **Lấy MONGO_URI ở đâu?**  
-> Vào [MongoDB Atlas](https://cloud.mongodb.com) → Cluster của bạn → **Connect** → **Connect your application** → Chọn Driver **Node.js** → Copy connection string → Thay `<password>` bằng mật khẩu thật.
+Luu y:
+- Neu gap `querySrv ECONNREFUSED`, giu bien `MONGO_DNS_SERVERS` nhu tren.
+- Trong MongoDB Atlas, can mo IP Access List phu hop.
 
-> Nếu gặp lỗi `querySrv ECONNREFUSED`, đặt thêm `MONGO_DNS_SERVERS=8.8.8.8,1.1.1.1` trong `.env` để Node.js dùng DNS public khi resolve `mongodb+srv`.
-
----
-
-## Chạy server
+### 3) Chay server
 
 ```bash
-# Chế độ dev (auto restart khi sửa code)
 npm run dev
-
-# Chế độ production
+# hoac
 npm start
 ```
 
-Server sẽ chạy tại: `http://localhost:5000`
+Base URL local: `http://localhost:5000`
 
----
+## API Checklist
 
-## Danh sách Endpoints
+### Core CRUD
 
-| Method | Endpoint | Mô tả |
-|--------|----------|-------|
-| GET | `/` | Kiểm tra server |
-| GET | `/api/orders` | Lấy tất cả đơn hàng |
-| GET | `/api/orders?status=pending` | Lọc theo trạng thái |
-| GET | `/api/orders?sort=asc` | Sắp xếp theo tổng tiền tăng dần |
-| GET | `/api/orders?sort=desc` | Sắp xếp theo tổng tiền giảm dần |
-| GET | `/api/orders/search?name=abc` | Tìm theo tên khách hàng |
-| GET | `/api/orders/:id` | Lấy 1 đơn hàng theo ID |
-| POST | `/api/orders` | Tạo đơn hàng mới |
-| PUT | `/api/orders/:id` | Cập nhật đơn hàng |
-| DELETE | `/api/orders/:id` | Xóa đơn hàng |
+- [x] `GET /` - Health check
+- [x] `GET /api/orders` - Lay tat ca don hang
+- [x] `GET /api/orders/:id` - Lay don hang theo ID
+- [x] `POST /api/orders` - Tao don hang moi
+- [x] `PUT /api/orders/:id` - Cap nhat don hang
+- [x] `DELETE /api/orders/:id` - Xoa don hang
 
-**Các giá trị `status` hợp lệ:** `pending` | `confirmed` | `shipped` | `delivered` | `cancelled`
+### Mo Rong
 
----
+- [x] `GET /api/orders?status=pending` - Loc theo trang thai
+- [x] `GET /api/orders/search?name=...` - Tim kiem theo ten khach hang (regex, case-insensitive)
+- [x] `GET /api/orders?sort=asc|desc` - Sap xep theo `totalAmount`
+- [x] Validation `totalAmount`
+- [x] Response chuan hoa: `{ success, message, data }`
+- [x] Logging middleware bang `morgan`
 
-## Ví dụ JSON
+## Mau Request
 
-### POST `/api/orders` — Tạo đơn hàng mới
+### Tao don hang
+
+`POST /api/orders`
 
 ```json
 {
@@ -99,111 +115,45 @@ Server sẽ chạy tại: `http://localhost:5000`
     { "productName": "Laptop Dell XPS", "quantity": 1, "unitPrice": 25000000 },
     { "productName": "Chuot Logitech", "quantity": 2, "unitPrice": 500000 }
   ],
-  "totalAmount": 26000000
+  "totalAmount": 26000000,
+  "status": "pending"
 }
 ```
 
-> ⚠️ `totalAmount` **phải bằng đúng** tổng `quantity × unitPrice` của tất cả items.  
-> Trường hợp trên: `1×25000000 + 2×500000 = 26000000` ✅
+## Huong Dan Test Postman
 
-### PUT `/api/orders/:id` — Cập nhật trạng thái
+1. Import collection co san: `postman/order-management-api.postman_collection.json`.
+2. Tao environment voi bien `baseUrl`:
+   - Local: `http://localhost:5000`
+   - Production: `https://order-management-api-64wl.onrender.com`
+3. Chay lan luot cac request trong collection (01 -> 13).
 
-```json
-{
-  "status": "confirmed"
-}
-```
+## Anh Chup Ket Qua Test
 
----
+Chen screenshot cua ban vao muc nay khi nop bai (goi y):
 
-## Cấu trúc Response
+- Anh 1: Health check tra ve `success: true`
+- Anh 2: Tao don hang thanh cong (201)
+- Anh 3: Validation sai `totalAmount` (400)
+- Anh 4: Filter theo `status=pending`
+- Anh 5: Search theo `name=b`
+- Anh 6: Sort theo `totalAmount`
+- Anh 7: Deploy Render tra ve ket qua online
 
-### Thành công
+## Cac Thu Muc Chinh
 
-```json
-{
-  "success": true,
-  "message": "Tao don hang thanh cong",
-  "data": { ... }
-}
-```
+- `server.js`: Khoi dong app, middleware, ket noi MongoDB, map routes.
+- `models/Order.js`: Mongoose schema cua Order.
+- `routes/orderRoutes.js`: CRUD + filter/search/sort + validation.
+- `postman/order-management-api.postman_collection.json`: Collection de test nhanh.
 
-### Thất bại
+## Deploy Render (Tom Tat)
 
-```json
-{
-  "success": false,
-  "message": "totalAmount khong chinh xac...",
-  "error": "..."
-}
-```
-
----
-
-## Hướng dẫn test với Postman
-
-**Bước 1:** Mở Postman → New Request
-
-**Bước 2:** Test lần lượt theo thứ tự:
-
-1. **Tạo đơn hàng** — `POST http://localhost:5000/api/orders`
-   - Chọn tab **Body** → **raw** → **JSON**
-   - Dán JSON mẫu ở trên vào
-   - Ghi lại `_id` trong response để dùng cho các bước sau
-
-2. **Lấy tất cả** — `GET http://localhost:5000/api/orders`
-
-3. **Lọc theo trạng thái** — `GET http://localhost:5000/api/orders?status=pending`
-
-4. **Tìm kiếm** — `GET http://localhost:5000/api/orders/search?name=nguyen`
-
-5. **Lấy theo ID** — `GET http://localhost:5000/api/orders/<_id>`
-
-6. **Cập nhật** — `PUT http://localhost:5000/api/orders/<_id>`
-   - Body: `{"status": "confirmed"}`
-
-7. **Xóa** — `DELETE http://localhost:5000/api/orders/<_id>`
-
-**Tip:** Tạo 1 Collection trong Postman để lưu lại tất cả request, dễ test lại.
-
----
-
-## Deploy lên Render / Railway
-
-### Render.com (Free)
-
-1. Push code lên GitHub (nhớ **đừng push file `.env`**)
-2. Vào [render.com](https://render.com) → New Web Service → Kết nối GitHub repo
-3. Cấu hình:
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-4. Vào tab **Environment** → Add các biến:
-   - `MONGO_URI` = connection string của bạn
-   - `NODE_ENV` = `production`
-
-### Railway.app
-
-1. Vào [railway.app](https://railway.app) → New Project → Deploy from GitHub
-2. Add biến môi trường tương tự trong tab **Variables**
-
----
-
-## Giải thích từng file
-
-### `server.js`
-File khởi động chính. Cấu hình middleware (cors, morgan, json), kết nối MongoDB, gắn routes vào `/api/orders`, lắng nghe cổng.
-
-### `models/Order.js`
-Định nghĩa "khuôn mẫu" dữ liệu với Mongoose Schema. Khai báo các trường, kiểu dữ liệu, ràng buộc (required, min, enum). Mongoose dùng schema này để validate tự động trước khi lưu vào DB.
-
-### `routes/orderRoutes.js`
-Xử lý toàn bộ logic CRUD. Mỗi `router.get/post/put/delete` xử lý 1 endpoint. Bao gồm validate ObjectId, validate totalAmount, xây dựng filter/sort linh hoạt, và trả response chuẩn.
-
-### `.env`
-Lưu thông tin nhạy cảm (mật khẩu DB, cổng). **Không bao giờ commit file này lên Git.**
-
-### `.env.example`
-File mẫu chứa các tên biến (không có giá trị thật), để người khác biết cần cấu hình những gì.
-
-### `.gitignore`
-Liệt kê các file/thư mục không push lên Git: `node_modules/`, `.env`.
+1. Tao Web Service tu repo GitHub tren Render.
+2. Build command: `npm install`.
+3. Start command: `npm start`.
+4. Environment variables:
+   - `MONGO_URI`
+   - `NODE_ENV=production`
+   - `MONGO_DNS_SERVERS=8.8.8.8,1.1.1.1`
+5. Truy cap URL production: https://order-management-api-64wl.onrender.com
