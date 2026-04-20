@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Bien moi truong - TUYET DOI KHONG push len Git
+# File nay chua mat khau MongoDB!
+.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
