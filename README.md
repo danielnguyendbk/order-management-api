@@ -133,19 +133,19 @@ Base URL local: `http://localhost:5000`
 Chen screenshot cua ban vao muc nay khi nop bai (goi y):
 
 - Anh 1: Health check tra ve `success: true`
-![alt text](image.png)
+![alt text](images/image.png)
 - Anh 2: Tao don hang thanh cong (201)
-![alt text](image-1.png)
+![alt text](images/image-1.png)
 - Anh 3: Validation sai `totalAmount` (400)
-![alt text](image-2.png)
+![alt text](images/image-2.png)
 - Anh 4: Filter theo `status=pending`
-![alt text](image-3.png)
+![alt text](images/image-3.png)
 - Anh 5: Search theo `name=b`
-![alt text](image-4.png)
+![alt text](images/image-4.png)
 - Anh 6: Sort theo `totalAmount`
-![alt text](image-5.png)
+![alt text](images/image-5.png)
 - Anh 7: Deploy Render tra ve ket qua online
-![alt text](image-6.png)
+![alt text](images/image-6.png)
 
 ## Cac Thu Muc Chinh
 
