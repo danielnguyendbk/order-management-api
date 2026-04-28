@@ -50,21 +50,8 @@ npm install
 
 ### 2) Tao file env
 
-```bash
-# Linux/macOS
-cp .env.example .env
 
-# Windows cmd
-copy .env.example .env
-```
 
-Cap nhat `.env`:
-
-```dotenv
-PORT=5000
-MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxx.mongodb.net/OrderDB?retryWrites=true&w=majority
-NODE_ENV=development
-MONGO_DNS_SERVERS=8.8.8.8,1.1.1.1
 ```
 
 Luu y:
